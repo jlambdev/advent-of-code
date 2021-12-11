@@ -1,4 +1,5 @@
-import { countEasyDigits, getProductOfAllNumbers } from '../signals';
+import { countEasyDigits } from '../partOne';
+import { getProductOfAllNumbers } from '../partTwo';
 import { smallInput, largeInput } from '../fixtures';
 
 describe('Seven Segment Search', () => {

@@ -1,4 +1,4 @@
-import { countEasyDigits, getProductOfAllNumbers } from '../count';
+import { countEasyDigits, getProductOfAllNumbers } from '../signals';
 import { smallInput, largeInput } from '../fixtures';
 
 describe('Seven Segment Search', () => {
@@ -9,6 +9,6 @@ describe('Seven Segment Search', () => {
 
     it('should identify the product of all correctly mapped numbers', () => {
         expect(getProductOfAllNumbers(smallInput)).toStrictEqual(61229);
-        // expect(countEasyDigits(largeInput)).toStrictEqual(1);
+        expect(getProductOfAllNumbers(largeInput)).toStrictEqual(1063760);
     });
 });

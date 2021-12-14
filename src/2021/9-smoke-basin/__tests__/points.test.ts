@@ -10,8 +10,8 @@ describe('Smoke Basin', () => {
         expect(sumRiskLevelsForLowPoints(largeInput)).toStrictEqual(468);
     });
 
-    it.skip('should calculate the product of the three largest basins', () => {
+    it('should calculate the product of the three largest basins', () => {
         expect(productOfThreeLargestBasins(smallInput)).toStrictEqual(1134);
-        // expect(productOfThreeLargestBasins(largeInput)).toStrictEqual(1);
+        expect(productOfThreeLargestBasins(largeInput)).toStrictEqual(1280496);
     });
 });

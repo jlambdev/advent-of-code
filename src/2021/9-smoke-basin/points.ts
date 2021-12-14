@@ -1,22 +1,34 @@
+const isLowerThan = (
+    rows: string[],
+    value: string,
+    rowIdx: number,
+    colIdx: number,
+) => {
+    if (!rows[rowIdx] || !rows[rowIdx][colIdx]) return true;
+    return Number(value) < Number(rows[rowIdx][colIdx]);
+};
+
+const isLowPoint = (
+    rows: string[],
+    value: string,
+    rowIdx: number,
+    colIdx: number,
+) => {
+    return (
+        isLowerThan(rows, value, rowIdx - 1, colIdx) && // check up
+        isLowerThan(rows, value, rowIdx + 1, colIdx) && // check down
+        isLowerThan(rows, value, rowIdx, colIdx - 1) && // check left
+        isLowerThan(rows, value, rowIdx, colIdx + 1) // check right
+    );
+};
+
 export const sumRiskLevelsForLowPoints = (input: string) => {
     const rows = input.split('\n');
 
-    const isLowerThan = (value: string, rowIdx: number, colIdx: number) => {
-        if (!rows[rowIdx] || !rows[rowIdx][colIdx]) return true;
-        return Number(value) < Number(rows[rowIdx][colIdx]); // just take care of parsing here
-    };
-
     let riskLevelSum = 0;
     rows.forEach((row, rowIdx) => {
-        const locations = row.split('');
-        locations.forEach((location, colIdx) => {
-            const isLowPoint =
-                isLowerThan(location, rowIdx - 1, colIdx) && // check up
-                isLowerThan(location, rowIdx + 1, colIdx) && // check down
-                isLowerThan(location, rowIdx, colIdx - 1) && // check left
-                isLowerThan(location, rowIdx, colIdx + 1); // check right
-
-            if (isLowPoint) {
+        row.split('').forEach((location, colIdx) => {
+            if (isLowPoint(rows, location, rowIdx, colIdx)) {
                 riskLevelSum += 1 + Number(location);
             }
         });
@@ -26,7 +38,54 @@ export const sumRiskLevelsForLowPoints = (input: string) => {
 };
 
 export const productOfThreeLargestBasins = (input: string) => {
-    let product = 1;
+    const rows = input.split('\n');
+    const checkedLocations = new Set<string>(); // '4,5'
+    const basins = new Map<string, number>();
 
-    return product;
+    const recurseToBasinEdge = (
+        rowIdx: number,
+        colIdx: number,
+        basinRoot?: string,
+    ): number => {
+        // base cases
+        if (
+            !rows[rowIdx] ||
+            !rows[rowIdx][colIdx] ||
+            Number(rows[rowIdx][colIdx]) === 9
+        )
+            return;
+        const key = `${rowIdx},${colIdx}`;
+        if (checkedLocations.has(key)) return;
+
+        checkedLocations.add(key);
+        if (!basinRoot) basins.set(key, 1);
+        else basins.set(basinRoot, basins.get(basinRoot) + 1);
+
+        const root = basinRoot ?? key;
+
+        recurseToBasinEdge(rowIdx - 1, colIdx, root); // check up
+        recurseToBasinEdge(rowIdx + 1, colIdx, root); // check down
+        recurseToBasinEdge(rowIdx, colIdx - 1, root); // check left
+        recurseToBasinEdge(rowIdx, colIdx + 1, root); // check right
+    };
+
+    rows.forEach((row, rowIdx) => {
+        row.split('').forEach((location, colIdx) => {
+            if (isLowPoint(rows, location, rowIdx, colIdx)) {
+                recurseToBasinEdge(rowIdx, colIdx);
+            }
+        });
+    });
+
+    // not the nicest solution
+    const sortedBasinSizes = [];
+    for (const [_, size] of basins) {
+        sortedBasinSizes.push(size);
+    }
+    sortedBasinSizes.sort((a, b) => b - a);
+
+    // Debugging
+    // console.log({ checkedLocations, basins, sortedBasinSizes });
+
+    return sortedBasinSizes[0] * sortedBasinSizes[1] * sortedBasinSizes[2];
 };

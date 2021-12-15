@@ -34,7 +34,7 @@ const caveFactory = (id: string): Cave => {
     return new Cave(id, CaveType.Small);
 };
 
-export const countPathsSingleSmallCaveVisit = (input: string) => {
+export const countPaths = (input: string, allowDoubleVisit = false) => {
     const connections = input.split('\n').map((link) => link.split('-'));
 
     // used to prevent duplicate instantiation of caves
@@ -55,26 +55,35 @@ export const countPathsSingleSmallCaveVisit = (input: string) => {
 
     const validPaths = new Set<string>();
 
-    const recurseToEndCave = (path: string, caves: Set<Cave>) => {
+    const recurseToEndCave = (
+        path: string,
+        caves: Set<Cave>,
+        didDoubleVisit: boolean,
+    ) => {
         for (const cave of caves) {
+            let doubleVisit = didDoubleVisit;
             if (cave.type === CaveType.Start) continue;
             if (cave.type === CaveType.End) {
                 validPaths.add(`${path}-${cave.id}`);
                 continue;
             }
             if (cave.type === CaveType.Small) {
-                if (new RegExp(cave.id).test(path)) continue; // already visited a small cave
+                if (new RegExp(cave.id).test(path)) {
+                    if (allowDoubleVisit && !didDoubleVisit) doubleVisit = true;
+                    else continue;
+                }
             }
             recurseToEndCave(
                 `${path}-${cave.id}`,
                 idToCaveMap.get(cave.id).connections,
+                doubleVisit,
             );
         }
         // empty connections return here too
     };
 
     const start = idToCaveMap.get('start');
-    recurseToEndCave(start.id, start.connections);
+    recurseToEndCave(start.id, start.connections, false);
 
     return validPaths.size;
 };

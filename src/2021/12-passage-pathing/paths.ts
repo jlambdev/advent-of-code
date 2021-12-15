@@ -37,14 +37,6 @@ const caveFactory = (id: string): Cave => {
 export const countPathsSingleSmallCaveVisit = (input: string) => {
     const connections = input.split('\n').map((link) => link.split('-'));
 
-    // start-A
-    // start-b
-    // A-c
-    // A-b
-    // b-d
-    // A-end
-    // b-end
-
     // used to prevent duplicate instantiation of caves
     const idToCaveMap = new Map<string, Cave>();
 
@@ -65,45 +57,24 @@ export const countPathsSingleSmallCaveVisit = (input: string) => {
 
     const recurseToEndCave = (path: string, caves: Set<Cave>) => {
         for (const cave of caves) {
-            // console.log('assessing connection', { path, cave });
-            if (cave.type === CaveType.Start) {
-                // console.log('back to start cave', {
-                //     path: `${path}-${cave.id}`,
-                //     cave,
-                // });
-            } else if (cave.type === CaveType.End) {
+            if (cave.type === CaveType.Start) continue;
+            if (cave.type === CaveType.End) {
                 validPaths.add(`${path}-${cave.id}`);
-            } else if (cave.type === CaveType.Small) {
-                // console.log('small cave', { path: `${path}-${cave.id}`, cave });
-                if (new RegExp(cave.id).test(path)) {
-                    // console.log('already been to small cave', {
-                    //     path: `${path}-${cave.id}`,
-                    //     cave,
-                    // });
-                } else {
-                    recurseToEndCave(
-                        `${path}-${cave.id}`,
-                        idToCaveMap.get(cave.id).connections,
-                    );
-                }
-            } else {
-                recurseToEndCave(
-                    `${path}-${cave.id}`,
-                    idToCaveMap.get(cave.id).connections,
-                );
+                continue;
             }
+            if (cave.type === CaveType.Small) {
+                if (new RegExp(cave.id).test(path)) continue; // already visited a small cave
+            }
+            recurseToEndCave(
+                `${path}-${cave.id}`,
+                idToCaveMap.get(cave.id).connections,
+            );
         }
         // empty connections return here too
     };
 
     const start = idToCaveMap.get('start');
     recurseToEndCave(start.id, start.connections);
-
-    // Debugging
-    // console.log({ validPaths });
-    // for (const [_, cave] of idToCaveMap) {
-    //     console.log({ cave, conns: cave.connections });
-    // }
 
     return validPaths.size;
 };

@@ -1,4 +1,4 @@
-import { largeInput, mediumInput, smallInput } from '../fixtures';
+import { largeInput, mediumInput, smallInput, puzzleInput } from '../fixtures';
 import { countPathsSingleSmallCaveVisit } from '../paths';
 
 describe('Passage Pathing', () => {
@@ -6,6 +6,6 @@ describe('Passage Pathing', () => {
         expect(countPathsSingleSmallCaveVisit(smallInput)).toStrictEqual(10);
         expect(countPathsSingleSmallCaveVisit(mediumInput)).toStrictEqual(19);
         expect(countPathsSingleSmallCaveVisit(largeInput)).toStrictEqual(226);
-        // expect(countPathsSingleSmallCaveVisit(puzzleInput)).toStrictEqual(1);
+        expect(countPathsSingleSmallCaveVisit(puzzleInput)).toStrictEqual(5958);
     });
 });

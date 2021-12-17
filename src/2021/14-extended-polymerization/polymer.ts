@@ -12,7 +12,10 @@ class Node {
     }
 }
 
-export const differenceAfterPolymerization = (input: string) => {
+export const differenceAfterPolymerization = (
+    input: string,
+    maxIterations: number,
+) => {
     const lines = input.split('\n');
     const polymerTemplate = lines[0];
 
@@ -53,20 +56,32 @@ export const differenceAfterPolymerization = (input: string) => {
         if (!head) {
             const leftNode = new Node(polymerTemplate[left], rightNode);
             head = leftNode;
-            insertNewElement(leftNode, rightNode, 1, 3);
+            insertNewElement(leftNode, rightNode, 1, maxIterations);
         } else {
             tail.setNext(rightNode);
-            insertNewElement(tail, rightNode, 1, 3);
+            insertNewElement(tail, rightNode, 1, maxIterations);
         }
         tail = rightNode;
     }
 
     // traverse linked list (full polymer chain)
-    let test = '';
+    const counter = new Map<string, number>();
     while (head) {
-        test += head.value;
+        if (!counter.has(head.value)) counter.set(head.value, 1);
+        else counter.set(head.value, counter.get(head.value) + 1);
         head = head.next;
     }
 
-    console.log({ polymerTemplate, pairInsertionMap, test });
+    // maybe there is some optimisation that could be done earlier, but its ok
+    let highest;
+    let lowest;
+    for (const [_, value] of counter) {
+        if (!highest) highest = value;
+        else if (value > highest) highest = value;
+
+        if (!lowest) lowest = value;
+        else if (value < lowest) lowest = value;
+    }
+
+    return highest - lowest;
 };

@@ -85,7 +85,6 @@ export const revealLetterCode = (input: string) => {
     // update plots where there is a dot (draw code)
     for (const dot of uniqueDots) {
         const [x, y] = dot.split(',').map(Number);
-        if (!code[y]) code[y] = [];
         code[y][x] = '#';
     }
 

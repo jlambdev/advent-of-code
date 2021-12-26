@@ -12,7 +12,7 @@ class Node {
     }
 }
 
-export const differenceAfterPolymerization = (
+export const differenceAfterPolymerizationRecursive = (
     input: string,
     maxIterations: number,
 ) => {
@@ -83,5 +83,85 @@ export const differenceAfterPolymerization = (
         else if (value < lowest) lowest = value;
     }
 
+    // console.log({ highest, lowest });
+
     return highest - lowest;
+};
+
+// adapted from somewhere else because my recursive solution hangs
+export const differenceAfterPolymerizationIterative = (
+    input: string,
+    maxIterations: number,
+) => {
+    // start a count of all elements
+    const elementCount = new Map<string, number>();
+
+    const [template, unprocessedRules] = input.split('\n\n');
+
+    const rules = unprocessedRules.split(`\n`).reduce((acc, next) => {
+        const [pair, elementToInsert] = next.split(' -> ');
+        acc.set(pair, elementToInsert);
+        if (!elementCount.has(elementToInsert)) {
+            elementCount.set(elementToInsert, 0);
+        }
+        return acc;
+    }, new Map<string, string>());
+
+    // count the chars in the template string
+    for (const char of template) {
+        const count = elementCount.get(char);
+        elementCount.set(char, count + 1);
+    }
+
+    // keep track of generated pairs, starting with template
+    const pairs = new Map<string, number>();
+    for (let i = 0; i < template.length - 1; i++) {
+        pairs.set(`${template[i]}${template[i + 1]}`, 1);
+    }
+
+    const addOrIncrement = (
+        map: Map<string, number>,
+        key: string,
+        amount: number,
+    ) => {
+        const value = map.get(key);
+        if (value) {
+            map.set(key, value + amount);
+        } else {
+            map.set(key, amount);
+        }
+    };
+
+    while (maxIterations > 0) {
+        const currentPairs = Array.from(pairs.entries());
+
+        for (const [pair, pairCount] of currentPairs) {
+            const nextChar = rules.get(pair);
+
+            const count = elementCount.get(nextChar);
+            elementCount.set(nextChar, count + pairCount);
+
+            pairs.set(pair, pairs.get(pair) - pairCount);
+
+            addOrIncrement(pairs, `${pair[0]}${nextChar}`, pairCount);
+            addOrIncrement(pairs, `${nextChar}${pair[1]}`, pairCount);
+        }
+
+        --maxIterations;
+    }
+
+    const max = Math.max(...Array.from(elementCount.values()));
+    const min = Math.min(...Array.from(elementCount.values()));
+
+    // console.log({
+    //     template,
+    //     rules,
+    //     elementCount,
+    //     pairs,
+    //     maxIterations,
+    //     max,
+    //     min,
+    // });
+
+    return max - min;
 };

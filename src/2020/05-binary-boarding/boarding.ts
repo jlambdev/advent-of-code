@@ -1,25 +1,33 @@
+const binarySearch = (
+    upperBound: number,
+    steps: string,
+    shouldReduceUpperBound: (step: string) => boolean,
+) => {
+    let lowerBound = 0;
+    for (const step of steps) {
+        if (shouldReduceUpperBound(step)) {
+            upperBound -= Math.round((upperBound - lowerBound) / 2);
+        } else {
+            lowerBound += Math.round((upperBound - lowerBound) / 2);
+        }
+    }
+    return lowerBound;
+};
+
 export const getSeatId = (input: string) => {
-    let top = 0;
-    let bottom = 127;
-    for (const row of input.substring(0, 7)) {
-        if (row === 'F') {
-            bottom -= Math.round((bottom - top) / 2);
-        } else {
-            top += Math.round((bottom - top) / 2); // 'B'
-        }
-    }
+    const row = binarySearch(
+        127,
+        input.substring(0, 7),
+        (step: string) => step === 'F',
+    );
 
-    let left = 0;
-    let right = 7;
-    for (const column of input.substring(7)) {
-        if (column === 'L') {
-            right -= Math.round((right - left) / 2);
-        } else {
-            left += Math.round((right - left) / 2); // 'R'
-        }
-    }
+    const column = binarySearch(
+        7,
+        input.substring(7),
+        (step: string) => step === 'L',
+    );
 
-    return top * 8 + left;
+    return row * 8 + column;
 };
 
 export const getHighestSeatId = (input: string) => {

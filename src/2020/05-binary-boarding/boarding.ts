@@ -1,3 +1,4 @@
+// maybe lost some readability with this refactor here
 const binarySearch = (
     upperBound: number,
     steps: string,

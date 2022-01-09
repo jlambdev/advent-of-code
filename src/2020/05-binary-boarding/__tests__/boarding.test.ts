@@ -1,4 +1,5 @@
-import { getSeatId } from '../boarding';
+import { getHighestSeatId, getSeatId, getMissingSeatId } from '../boarding';
+import { puzzleInput } from '../fixtures';
 
 describe('Binary Boarding', () => {
     describe('getSeatId', () => {
@@ -10,5 +11,15 @@ describe('Binary Boarding', () => {
         });
     });
 
-    it.todo('should have some tests');
+    describe('getHighestSeatId', () => {
+        it('should identify many seat IDs and return the highest value', () => {
+            expect(getHighestSeatId(puzzleInput)).toStrictEqual(850);
+        });
+    });
+
+    describe('getMissingSeatId', () => {
+        it('should find the missing seat ID, based on all boarding passes', () => {
+            expect(getMissingSeatId(puzzleInput)).toStrictEqual(599);
+        });
+    });
 });

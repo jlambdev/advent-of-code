@@ -40,7 +40,7 @@ describe('Handy Haversacks', () => {
             expect(processBags(puzzle).numContainerBags).toStrictEqual(192);
         });
 
-        it.only('should identify the number of bags that `shiny gold` bag needs to hold', () => {
+        it.skip('should identify the number of bags that `shiny gold` bag needs to hold', () => {
             expect(processBags(smallInput).numRequiredBags).toStrictEqual(32);
             // expect(processBags(puzzle).numRequiredBags).toStrictEqual(1);
         });

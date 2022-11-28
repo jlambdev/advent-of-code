@@ -9,7 +9,7 @@ export const extractBagColours = (input: string): Bag => {
 
     const firstSpaceRegex = /(?<=^\S+)\s/;
     const children = unparsedChildColours
-        .replaceAll(/bags?\.?/g, '')
+        .replace(/bags?\.?/g, '')
         .split(', ')
         .filter((bags) => !/no other/.test(bags))
         .reduce((bags: Bag['children'], nextBag) => {
@@ -63,7 +63,7 @@ export const processBags = (input: string) => {
     let numRequiredBags = 0;
     const recurseThroughChildren = (colour: string) => {
         const bag = bags.get(colour);
-        console.log({ bag });
+        // console.log({ bag });
         if (!bag || Object.keys(bag.children).length === 0) return;
 
         for (const [colour, amount] of Object.entries(bag.children)) {
@@ -73,7 +73,7 @@ export const processBags = (input: string) => {
     };
     recurseThroughChildren('shiny gold');
 
-    console.log({ bags });
+    // console.log({ bags });
 
     return {
         numContainerBags: eligibleContainerBags.size,

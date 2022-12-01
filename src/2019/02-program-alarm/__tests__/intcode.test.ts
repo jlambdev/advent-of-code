@@ -16,6 +16,7 @@ describe('1202 Program Alarm', () => {
         });
 
         it('should work with pre-run replacements', () => {
+            // 1: noun; 2: verb
             const replacements = [
                 [1, 12],
                 [2, 2],

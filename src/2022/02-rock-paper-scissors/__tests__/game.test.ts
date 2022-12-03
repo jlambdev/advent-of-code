@@ -8,6 +8,11 @@ import {
     playRoundUsingOutcomeStrategy,
 } from '../game';
 
+/*
+    Note: an alternative approach to this would be to solve by 
+    calculating all the permutations of games / results up front
+*/
+
 describe('Rock Paper Scissors', () => {
     describe('Move Strategy', () => {
         const moveStrategy = {

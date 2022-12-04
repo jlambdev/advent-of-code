@@ -21,7 +21,7 @@ export function hasOverlappingSection(pairs: string): boolean {
 }
 
 /**
- * Example usage: sumUsingFilterFunction(puzzleInput, sumOfContainedSections)
+ * Example usage: sumUsingFilterFunction(puzzleInput, hasContainedSection)
  *
  * @param input Puzzle input, e.g. `2-4,6-8\n2-3,4-5...`
  * @param filterFunc hasContainedSection | hasOverlappingSection

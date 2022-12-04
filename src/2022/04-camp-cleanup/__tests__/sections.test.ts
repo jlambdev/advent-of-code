@@ -2,8 +2,6 @@ import { largeInput } from '../fixture';
 import {
     hasContainedSection,
     hasOverlappingSection,
-    sumOfContainedSections,
-    sumOfOverlappingSections,
     sumUsingFilterFunction,
 } from '../sections';
 

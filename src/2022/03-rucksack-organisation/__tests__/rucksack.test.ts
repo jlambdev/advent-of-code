@@ -7,15 +7,12 @@ import {
     sumOfItemPrioritiesForElfGroups,
 } from '../rucksack';
 
-const groupOne = `vJrwpWtwJgWrhcsFMMfFFhFp
+const smallInput = `vJrwpWtwJgWrhcsFMMfFFhFp
 jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
-PmmdzqPrVvPwwTWBwg`;
-
-const groupTwo = `wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw`;
-
-const smallInput = `${groupOne}\n${groupTwo}`;
 
 describe('Rucksack Reorganization', () => {
     it('should find the items present in both rucksack compartments', () => {

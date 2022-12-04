@@ -24,5 +24,7 @@ describe('1202 Program Alarm', () => {
             const output = run(program, replacements);
             expect(output[0]).toStrictEqual(7594646);
         });
+
+        it.todo('should find the noun and verb with an expected output');
     });
 });

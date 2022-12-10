@@ -1,5 +1,3 @@
-import { inspectNestedObject } from '../debugUtils';
-
 export class CPU {
     private register: number;
     private clockCycle: number;

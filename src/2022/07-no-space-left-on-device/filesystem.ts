@@ -1,5 +1,3 @@
-import { inspect } from 'util';
-
 interface SharedProperties {
     name: string;
     size: number;
@@ -60,11 +58,6 @@ function createNewFile(name: string, size: number, parent: Directory): File {
         isDirectory: false,
         parent,
     };
-}
-
-// Pretty print nested object (useful for debugging, not part of solution)
-function inspectNestedObject(object: any): string {
-    return inspect(object, { showHidden: false, depth: null, colors: true });
 }
 
 export function updateDirectorySizes(directory: Directory, size: number): void {

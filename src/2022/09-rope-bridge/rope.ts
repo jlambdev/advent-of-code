@@ -1,5 +1,7 @@
 type Knot = [number, number];
 
+export type Rope = Array<Knot>;
+
 type Direction = 'U' | 'D' | 'L' | 'R';
 
 /* Improve readability when indexing Knot arrays */
@@ -10,36 +12,65 @@ function addVisitedTailPosition(tail: Knot, set: Set<string>): void {
     set.add(`${tail[0]},${tail[1]}`);
 }
 
-export function isTailNearHead(head: Knot, tail: Knot): boolean {
-    return Math.abs(tail[X] - head[X]) <= 1 && Math.abs(tail[Y] - head[Y]) <= 1;
+export function isFirstKnotNearSecond(first: Knot, second: Knot): boolean {
+    return Math.abs(second[X] - first[X]) <= 1 && Math.abs(second[Y] - first[Y]) <= 1;
 }
 
-export function moveHeadWithTail(
-    head: Knot,
-    tail: Knot,
-    direction: Direction,
-): [Knot, Knot] {
-    const oldHead: Knot = [...head];
+function getPullDirection(first: Knot, second: Knot): Direction {
+    if (first[Y] - second[Y] === 2) {
+        return 'R';
+    }
+    if (first[Y] - second[Y] === -2) {
+        return 'L';
+    }
+    if (first[X] - second[X] === 2) {
+        return 'U';
+    }
+    if (first[X] - second[X] === -2) {
+        return 'D';
+    }
+}
+
+export function pullKnots(rope: Rope, direction: Direction): Rope {
+    const pull = () => {
+        for (let current = 0, next = 1; next < rope.length; current++, next++) {
+            if (!isFirstKnotNearSecond(rope[current], rope[next])) {
+                const pullDirection = getPullDirection(rope[current], rope[next]);
+                let x = rope[current][X];
+                let y = rope[current][Y];
+                if (pullDirection === 'R' || pullDirection === 'L') {
+                    y = pullDirection === 'R' ? y - 1 : y + 1;
+                }
+                if (pullDirection === 'U' || pullDirection === 'D') {
+                    x = pullDirection === 'U' ? x - 1 : x + 1;
+                }
+                rope[next] = [x, y];
+            }
+        }
+    };
 
     if (direction === 'R') {
-        head[Y]++;
+        rope[0][Y]++;
+        pull();
     } else if (direction === 'L') {
-        head[Y]--;
+        rope[0][Y]--;
+        pull();
     } else if (direction === 'U') {
-        head[X]++;
+        rope[0][X]++;
+        pull();
     } else {
         // direction === 'D'
-        head[X]--;
+        rope[0][X]--;
+        pull();
     }
 
-    if (!isTailNearHead(head, tail)) {
-        tail = oldHead;
-    }
-
-    return [head, tail];
+    return rope;
 }
 
-export function moveRopeHead(input: string): {
+export function moveRope(
+    input: string,
+    ropeSize: number,
+): {
     head: Knot;
     tail: Knot;
     numPositionsTailHasVisited: number;
@@ -49,24 +80,28 @@ export function moveRopeHead(input: string): {
         return [direction, Number(moves)] as const;
     });
 
-    let head: Knot = [0, 0];
-    let tail: Knot = [0, 0];
-
+    const rope: Array<Knot> = [...Array(ropeSize)].map((_) => [0, 0]);
     const positionsTailHasVisited = new Set<string>();
-    addVisitedTailPosition(tail, positionsTailHasVisited);
+    addVisitedTailPosition(rope[rope.length - 1], positionsTailHasVisited);
+
+    // console.log('starting');
+    // console.group();
+    // console.log({ rope });
 
     motions.forEach(([direction, moves]) => {
         for (let i = 0; i < moves; i++) {
-            [head, tail] = moveHeadWithTail(head, tail, direction as Direction);
-            addVisitedTailPosition(tail, positionsTailHasVisited);
+            pullKnots(rope, direction as Direction);
+            // console.log(`pulling ${direction} move ${i}`, { rope });
+            addVisitedTailPosition(rope[rope.length - 1], positionsTailHasVisited);
         }
     });
 
-    // console.log({ head, tail, positionsTailHasVisited });
+    // console.log({ rope });
+    // console.groupEnd();
 
     return {
-        head,
-        tail,
+        head: rope[0],
+        tail: rope[rope.length - 1],
         numPositionsTailHasVisited: positionsTailHasVisited.size,
     };
 }

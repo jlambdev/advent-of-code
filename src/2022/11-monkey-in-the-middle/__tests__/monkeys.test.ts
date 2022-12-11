@@ -55,8 +55,10 @@ describe('Monkey in the Middle', () => {
      * 'divide by' numbers used by each monkey as part of their test. Then when the worry level
      * exceeds this commonDivisor, you can do worry % commonDivisor to lower it, while still
      * passing later tests by the monkey when it checks which next monkey receives the item.
+     *
+     * I calculate the common divisor in the `getMonkeyBusiness` function.
      */
-    it('identifies the level of monkey business after 10000 rounds, with no worry decrease', () => {
+    it('identifies the level of monkey business after 10000 rounds', () => {
         expect(getMonkeyBusiness(smallInput, 10000, false)).toStrictEqual(2713310158);
         expect(getMonkeyBusiness(puzzleInput, 10000, false)).toStrictEqual(15447387620);
     });

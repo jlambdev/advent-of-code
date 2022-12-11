@@ -57,10 +57,7 @@ describe('Monkey in the Middle', () => {
      * passing later tests by the monkey when it checks which next monkey receives the item.
      */
     it('identifies the level of monkey business after 10000 rounds, with no worry decrease', () => {
-        let commonDivisor = 23 * 19 * 13 * 17;
         expect(getMonkeyBusiness(smallInput, 10000, false)).toStrictEqual(2713310158);
-
-        commonDivisor = 2 * 13 * 3 * 17 * 19 * 7 * 11 * 5;
         expect(getMonkeyBusiness(puzzleInput, 10000, false)).toStrictEqual(15447387620);
     });
 });

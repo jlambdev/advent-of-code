@@ -1,3 +1,11 @@
+export const smallInput = `abcdef
+bababc
+abbcde
+abcccd
+aabcdd
+abcdee
+ababab`;
+
 export const puzzleInput = `auxwcbzrmdvpsjfgkrthnkioqm
 auxwcbzrmdvpsjfgbltonyijqe
 auxwcbzrmdfpsefgklthnoioqe

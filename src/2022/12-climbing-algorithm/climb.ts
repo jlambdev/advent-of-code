@@ -43,6 +43,7 @@ export function* getNeighbours(
     grid: Grid,
     x: number,
     y: number,
+    reverse: boolean,
 ): Generator<Coordinates, void, Coordinates> {
     const gridHeight = grid.length;
     const gridLength = grid[0].length;
@@ -66,9 +67,18 @@ export function* getNeighbours(
             continue;
         }
 
-        // Only if the new location is at most 1 unit higher, equal or any unit lower
-        if (getHeight(grid[x][y], grid[neighbourX][neighbourY]) <= 1) {
-            yield [neighbourX, neighbourY];
+        if (reverse) {
+            // Used for Part 2, where we start from the end node
+            // Only yield neighbour if it is at least 1 unit lower, equal or higher than others
+            if (getHeight(grid[neighbourX][neighbourY], grid[x][y]) <= 1) {
+                yield [neighbourX, neighbourY];
+            }
+        } else {
+            // Used for Part 1:
+            // Only yield neighbour if it is at most 1 unit higher, equal or any unit lower
+            if (getHeight(grid[x][y], grid[neighbourX][neighbourY]) <= 1) {
+                yield [neighbourX, neighbourY];
+            }
         }
     }
 }
@@ -83,10 +93,19 @@ export function sortEdgeListByMinDistance(edgeList: EdgeList): void {
  * You can make this more efficient by using a min priority queue instead.
  * There's no natively supported collection in TypeScript, the Python
  * equivalent would be the `heapq` module.
+ *
+ * For Part 2, you need to find the shortest distance from any 'a' step.
+ * A recommended strategy here is to backtrack from the end node, instead of
+ * searching all possible locations, since you have only 1 end node and just
+ * need to find the distance to the first 'a' node you encounter.
  */
-export function smallestNumberOfSteps(input: string): number {
+export function smallestNumberOfSteps(input: string, reverse: boolean = false): number {
     const grid = makeGrid(input);
-    const { start, end } = findStartAndEnd(grid);
+    let { start, end } = findStartAndEnd(grid);
+
+    if (reverse) {
+        [start, end] = [end, start];
+    }
 
     const visitedNodes = new Set<string>();
     const edgeList: EdgeList = [];
@@ -102,12 +121,19 @@ export function smallestNumberOfSteps(input: string): number {
         }
         visitedNodes.add(`${x},${y}`);
 
-        // if it's the end, we have found the shortest distance
-        if (x === end[0] && y === end[1]) {
-            return steps;
+        if (!reverse) {
+            // Part 1: if it's the end, we have found the shortest distance
+            if (x === end[0] && y === end[1]) {
+                return steps;
+            }
+        } else {
+            // Part 2: if we have reached any 'a' charater
+            if (grid[x][y] === 'a') {
+                return steps;
+            }
         }
 
-        for (const [neighbourX, neighbourY] of getNeighbours(grid, x, y)) {
+        for (const [neighbourX, neighbourY] of getNeighbours(grid, x, y, reverse)) {
             edgeList.push([steps + 1, neighbourX, neighbourY]);
         }
 

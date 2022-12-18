@@ -40,7 +40,7 @@ describe('Hill Climbing Algorithm', () => {
         const grid = makeGrid(smallInput);
 
         const allNeighbours: Array<Coordinates> = [];
-        for (const neighbour of getNeighbours(grid, 1, 4)) {
+        for (const neighbour of getNeighbours(grid, 1, 4, false)) {
             allNeighbours.push(neighbour);
         }
         expect(allNeighbours).toStrictEqual([
@@ -51,13 +51,20 @@ describe('Hill Climbing Algorithm', () => {
         ]);
 
         const neighboursBottomLeftCorner: Array<Coordinates> = [];
-        for (const neighbour of getNeighbours(grid, 4, 0)) {
+        for (const neighbour of getNeighbours(grid, 4, 0, false)) {
             neighboursBottomLeftCorner.push(neighbour);
         }
         expect(neighboursBottomLeftCorner).toStrictEqual([
             [3, 0],
             [4, 1],
         ]);
+
+        // Reverse scenario: checking lower nodes
+        const neighboursFromEndNode: Array<Coordinates> = [];
+        for (const neighbour of getNeighbours(grid, 2, 5, true)) {
+            neighboursFromEndNode.push(neighbour);
+        }
+        expect(neighboursFromEndNode).toStrictEqual([[2, 4]]);
     });
 
     it('should sort an edge list by the smallest distance/cost', () => {
@@ -75,8 +82,16 @@ describe('Hill Climbing Algorithm', () => {
         expect(edgeList[3][0]).toStrictEqual(9);
     });
 
-    it('should identify the fewest steps needed to reach the goal', () => {
+    it('should identify the fewest steps needed to reach the goal from the start node', () => {
         expect(smallestNumberOfSteps(smallInput)).toStrictEqual(31);
         expect(smallestNumberOfSteps(puzzleInput)).toStrictEqual(504);
+    });
+
+    /**
+     * Backtrack from the end node, instead of checking all possible start locations.
+     */
+    it('should identify the fewest steps needed to reach the goal from any `a` node', () => {
+        expect(smallestNumberOfSteps(smallInput, true)).toStrictEqual(29);
+        expect(smallestNumberOfSteps(puzzleInput, true)).toStrictEqual(500);
     });
 });

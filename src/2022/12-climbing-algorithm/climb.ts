@@ -1,142 +1,118 @@
-/* key = coordinates, e.g. 3,4; value = map of coordinates + weight */
-type Graph = Map<string, Map<string, number>>;
+export type Grid = Array<Array<string>>;
 
-function toCoords(x: number, y: number): string {
-    return `${x},${y}`;
+export type Coordinates = [number, number];
+
+/* Array of tuples, with [distance/cost, x, y] */
+export type EdgeList = Array<[number, number, number]>;
+
+export function makeGrid(input: string): Grid {
+    return input.split('\n').map((row) => row.split(''));
 }
 
-export function getWeight(from: string, to: string): number {
+export function getHeight(from: string, to: string): number {
+    if (from === 'S') {
+        from = 'a';
+    }
+    if (to === 'E') {
+        to = 'z';
+    }
     return to.charCodeAt(0) - from.charCodeAt(0);
 }
 
-function makeGraph(lines: Array<string>): {
-    source: string;
-    target: string;
-    graph: Graph;
-} {
-    const graph: Graph = new Map();
-    let source: string;
-    let target: string;
+export function findStartAndEnd(grid: Grid): { start: Coordinates; end: Coordinates } {
+    let start: Coordinates;
+    let end: Coordinates;
 
-    for (let row = 0; row < lines.length; row++) {
-        for (let column = 0; column < lines[0].length; column++) {
-            let letter = lines[row][column];
-            if (letter === 'S') {
-                source = toCoords(row, column);
-                letter = 'a';
-            } else if (letter === 'E') {
-                target = toCoords(row, column);
-                letter = 'z';
+    for (let row = 0; row < grid.length; row++) {
+        for (let column = 0; column < grid[0].length; column++) {
+            if (grid[row][column] === 'S') {
+                start = [row, column];
+            } else if (grid[row][column] === 'E') {
+                end = [row, column];
             }
-            const neighbors = new Map<string, number>();
-            if (lines[row - 1]?.[column]) {
-                neighbors.set(
-                    toCoords(row - 1, column),
-                    getWeight(letter, lines[row - 1][column]),
-                );
-            }
-            if (lines[row + 1]?.[column]) {
-                neighbors.set(
-                    toCoords(row + 1, column),
-                    getWeight(letter, lines[row + 1][column]),
-                );
-            }
-            if (lines[row][column - 1]) {
-                neighbors.set(
-                    toCoords(row, column - 1),
-                    getWeight(letter, lines[row][column - 1]),
-                );
-            }
-            if (lines[row][column + 1]) {
-                neighbors.set(
-                    toCoords(row, column + 1),
-                    getWeight(letter, lines[row][column + 1]),
-                );
-            }
-            graph.set(toCoords(row, column), neighbors);
         }
     }
 
-    return { source, target, graph };
+    return {
+        start,
+        end,
+    };
 }
 
+export function* getNeighbours(
+    grid: Grid,
+    x: number,
+    y: number,
+): Generator<Coordinates, void, Coordinates> {
+    const gridHeight = grid.length;
+    const gridLength = grid[0].length;
+
+    for (const [differenceX, differenceY] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+    ]) {
+        const neighbourX = x + differenceX;
+        const neighbourY = y + differenceY;
+
+        // Ignore any locations that are out of bounds of the Grid
+        if (
+            neighbourX < 0 ||
+            neighbourY < 0 ||
+            neighbourX >= gridHeight ||
+            neighbourY >= gridLength
+        ) {
+            continue;
+        }
+
+        // Only if the new location is at most 1 unit higher, equal or any unit lower
+        if (getHeight(grid[x][y], grid[neighbourX][neighbourY]) <= 1) {
+            yield [neighbourX, neighbourY];
+        }
+    }
+}
+
+export function sortEdgeListByMinDistance(edgeList: EdgeList): void {
+    edgeList.sort((a, b) => a[0] - b[0]);
+}
+
+/**
+ * Uses Dijkstra's algorithm to identify the path with the smallest cost.
+ *
+ * You can make this more efficient by using a min priority queue instead.
+ * There's no natively supported collection in TypeScript, the Python
+ * equivalent would be the `heapq` module.
+ */
 export function smallestNumberOfSteps(input: string): number {
-    const lines = input.split('\n');
-    const { source, target, graph } = makeGraph(lines);
+    const grid = makeGrid(input);
+    const { start, end } = findStartAndEnd(grid);
 
-    /*
-    for each vertex v in Graph.Vertices:
- 4          dist[v] ← INFINITY
- 5          prev[v] ← UNDEFINED
- 6          add v to Q
- 7      dist[source] ← 0
- 8      
- 9      while Q is not empty:
-10          u ← vertex in Q with min dist[u]
-11          remove u from Q
-12          
-13          for each neighbor v of u still in Q:
-14              alt ← dist[u] + Graph.Edges(u, v)
-15              if alt < dist[v]:
-16                  dist[v] ← alt
-17                  prev[v] ← u
-18
-19      return dist[], prev[]
-    */
+    const visitedNodes = new Set<string>();
+    const edgeList: EdgeList = [];
 
-    // Initialise distances to infinity for all nodes except source
-    const distances = new Map<string, number>();
-    for (const key of graph.keys()) {
-        distances.set(key, source === key ? 0 : Infinity);
-    }
+    // Add the start node to the edge list with a distance/cost of 0
+    edgeList.push([0, start[0], start[1]]);
 
-    // Keep track of unvisited nodes
-    const unvisited = new Set<string>(Array.from(graph.keys())); // refactor?
+    while (edgeList.length > 0) {
+        const [steps, x, y] = edgeList.shift();
 
-    // Debug
-    console.log({ source, target, s: graph.size, distances, unvisited });
-
-    // while (unvisited.size > 0) {
-    //     const current = getSmallestUnvisitedNode(unvisited, distances);
-    //     unvisited.delete(current);
-    // }
-
-    return 0;
-}
-
-// This function returns the shortest distance from the source node
-// to all other nodes in the graph.
-function dijkstra(graph: Map<number, Map<number, number>>, source: number): number[] {
-    // Initialize distances to infinity for all nodes except the source
-    // node, which has a distance of 0.
-    const distances: Array<number> = new Array(graph.size).fill(Number.POSITIVE_INFINITY);
-    distances[source] = 0;
-
-    // Keep track of the unvisited nodes.
-    const unvisited = new Set(Array.from(graph.keys()));
-
-    // Repeat the following until all nodes have been visited:
-    // 1. Select the unvisited node with the smallest distance.
-    // 2. Update the distances of its neighbors.
-    while (unvisited.size > 0) {
-        const current = getSmallestUnvisitedNode(unvisited, distances);
-        unvisited.delete(current);
-
-        // Update the distances of the neighbors.
-        for (const neighbor of graph.get(current).keys()) {
-            // Only consider this neighbor if it has not yet been visited.
-            if (unvisited.has(neighbor)) {
-                const distance = distances[current] + graph.get(current).get(neighbor);
-                if (distance < distances[neighbor]) {
-                    distances[neighbor] = distance;
-                }
-            }
+        if (visitedNodes.has(`${x},${y}`)) {
+            continue;
         }
+        visitedNodes.add(`${x},${y}`);
+
+        // if it's the end, we have found the shortest distance
+        if (x === end[0] && y === end[1]) {
+            return steps;
+        }
+
+        for (const [neighbourX, neighbourY] of getNeighbours(grid, x, y)) {
+            edgeList.push([steps + 1, neighbourX, neighbourY]);
+        }
+
+        sortEdgeListByMinDistance(edgeList); // alternatively use a min prio queue (heap)
     }
 
-    return distances;
-}
-
-function getSmallestUnvisitedNode(unvisited: Set<number>, distances: Array<number>) {
-    return 0;
+    throw new Error('Unable to find shortest distance in edge list');
 }

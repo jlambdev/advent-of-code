@@ -1,111 +1,127 @@
-function makeRockSet(input: string): { rocks: Set<string>; deepestRock: number } {
+function addRocksToSet(input: string): { rocks: Set<string>; maxY: number } {
     const paths = input
         .split('\n')
         .map((line) => line.split(' -> ').map((coords) => coords.split(',').map(Number)));
 
+    let maxY = 0;
     const rocks = new Set<string>();
-    let deepestRock = 0;
-
-    const drawRock = (x: number, y: number) => rocks.add(`${x},${y}`);
+    const addRock = (x: number, y: number) => rocks.add(`${x},${y}`);
 
     paths.forEach((path) => {
         for (let i = 1; i < path.length; i++) {
-            let [x, y] = path[i - 1];
-            const [endX, endY] = path[i];
+            const [prevX, prevY] = path[i - 1];
+            const [currentX, currentY] = path[i];
 
-            if (x === endX) {
-                if (y < endY) {
-                    // Draw down
-                    while (y <= endY) {
-                        drawRock(x, y);
-                        if (y > deepestRock) {
-                            deepestRock = y;
-                        }
-                        y++;
-                    }
-                } else {
-                    // Draw up
-                    while (y >= endY) {
-                        drawRock(x, y);
-                        y--;
-                    }
+            if (currentY > maxY) {
+                maxY = currentY;
+            }
+
+            if (currentY !== prevY) {
+                for (
+                    let y = Math.min(currentY, prevY);
+                    y < Math.max(currentY, prevY) + 1;
+                    y++
+                ) {
+                    addRock(currentX, y);
                 }
-            } else {
-                if (x < endX) {
-                    // Draw right
-                    while (x <= endX) {
-                        drawRock(x, y);
-                        x++;
-                    }
-                } else {
-                    // Draw left
-                    while (x >= endX) {
-                        drawRock(x, y);
-                        x--;
-                    }
+            }
+
+            if (currentX !== prevX) {
+                for (
+                    let x = Math.min(currentX, prevX);
+                    x < Math.max(currentX, prevX) + 1;
+                    x++
+                ) {
+                    addRock(x, currentY);
                 }
             }
         }
     });
 
-    return { rocks, deepestRock };
+    return { rocks, maxY };
 }
 
-export function unitsOfSandThatRest(input: string, hasFloor: boolean = false): number {
-    const { rocks, deepestRock } = makeRockSet(input);
+export function numRestingSandUnitsWithAbyss(input: string): number {
+    const { rocks: occupied, maxY } = addRocksToSet(input);
 
-    const occupiedSpaces = new Set([...rocks]);
-    let deepestUnitOfSand = 0;
-    let settledUnitsOfSand = 0;
+    const fillSand = (): boolean => {
+        let x = 500;
+        let y = 0;
 
-    let sandX = 500;
-    let sandY = 0;
+        while (y <= maxY) {
+            if (!occupied.has(`${x},${y + 1}`)) {
+                y++;
+                continue;
+            }
+            if (!occupied.has(`${x - 1},${y + 1}`)) {
+                x--;
+                y++;
+                continue;
+            }
+            if (!occupied.has(`${x + 1},${y + 1}`)) {
+                x++;
+                y++;
+                continue;
+            }
+            occupied.add(`${x},${y}`);
+            return true;
+        }
+        return false;
+    };
 
-    // I have no idea why +10 works here in the abyss scenario
-    const boundary = hasFloor ? Infinity : deepestRock + 10;
-    const floor = deepestRock + 2;
+    let restingSandUnits = 0;
+    while (true) {
+        const sandCameToRest = fillSand();
+        if (!sandCameToRest) {
+            break;
+        }
+        restingSandUnits++;
+    }
 
-    while (deepestUnitOfSand <= boundary && !occupiedSpaces.has('500,0')) {
-        if (
-            !occupiedSpaces.has(`${sandX},${sandY + 1}`) &&
-            (!hasFloor || sandY + 1 < floor)
-        ) {
-            // Sand can do down
-            sandY++;
-        } else if (
-            !occupiedSpaces.has(`${sandX - 1},${sandY + 1}`) &&
-            (!hasFloor || sandY + 1 < floor)
-        ) {
-            // Sand can go left
-            sandX--;
-            sandY++;
-        } else if (
-            !occupiedSpaces.has(`${sandX + 1},${sandY + 1}`) &&
-            (!hasFloor || sandY + 1 < floor)
-        ) {
-            // Sand can go right
-            sandX++;
-            sandY++;
-        } else {
-            // Sand must settle in current position
-            occupiedSpaces.add(`${sandX},${sandY}`);
-            settledUnitsOfSand++;
-            sandX = 500;
-            sandY = 0;
+    return restingSandUnits;
+}
+
+export function numRestingSandUnitsWithFloor(input: string): number {
+    const { rocks: occupied, maxY } = addRocksToSet(input);
+
+    const fillSand = (): [number, number] => {
+        let x = 500;
+        let y = 0;
+
+        if (occupied.has(`${x},${y}`)) {
+            return [x, y];
         }
 
-        if (sandY > deepestUnitOfSand) {
-            deepestUnitOfSand = sandY;
+        while (y <= maxY) {
+            if (!occupied.has(`${x},${y + 1}`)) {
+                y++;
+                continue;
+            }
+            if (!occupied.has(`${x - 1},${y + 1}`)) {
+                x--;
+                y++;
+                continue;
+            }
+            if (!occupied.has(`${x + 1},${y + 1}`)) {
+                x++;
+                y++;
+                continue;
+            }
+            break; // everything filled
+        }
+
+        return [x, y];
+    };
+
+    let restingSandUnits = 0;
+    while (true) {
+        const [x, y] = fillSand();
+        occupied.add(`${x},${y}`);
+        restingSandUnits++;
+        if (x === 500 && y === 0) {
+            break;
         }
     }
 
-    // Debug
-    console.log({
-        occ: occupiedSpaces.size,
-        deepestRock,
-        settledUnitsOfSand,
-        deepestUnitOfSand,
-    });
-
-    return settledUnitsOfSand;
+    return restingSandUnits;
 }

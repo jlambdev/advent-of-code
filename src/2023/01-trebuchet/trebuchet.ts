@@ -2,7 +2,7 @@ function isNumber(char: string): boolean {
     return Number.isInteger(Number(char));
 }
 
-export function sumCalibrationValuesPartOne(input: string) {
+export function sumCalibrationValuesPartOne(input: string): number {
     return input
         .split('\n')
         .map((line: string) => {
@@ -92,7 +92,7 @@ function findWordNumber(
     }
 }
 
-export function sumCalibrationValuesPartTwo(input: string) {
+export function sumCalibrationValuesPartTwo(input: string): number {
     const forwardWordTree = makeTree(numbersAsWords);
     const reverseWordTree = makeTree(
         numbersAsWords.map((word) => word.split('').reverse().join('')),

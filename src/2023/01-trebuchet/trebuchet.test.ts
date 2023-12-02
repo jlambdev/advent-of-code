@@ -1,18 +1,5 @@
 import { sumCalibrationValuesPartOne, sumCalibrationValuesPartTwo } from './trebuchet';
-import { document } from './input';
-
-const partOneSample = `1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet`;
-
-const partTwoSample = `two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen`;
+import { document, partOneSample, partTwoSample } from './input';
 
 describe('Trebuchet?!', () => {
     it('should sum calibration values (numbers only)', () => {

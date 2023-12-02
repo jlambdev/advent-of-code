@@ -23,3 +23,23 @@ export function checksum(input: string): number {
 
     return totalWithTwoLetters * totalWithThreeLetters;
 }
+
+export function twoClosestBoxes(input: string): string {
+    const lines = input.split('\n').sort();
+
+    for (let i = 0, j = 1; j < lines.length; i++, j++) {
+        let differentLetters: Array<string> = [];
+        for (let charIndex = 0; charIndex < lines[i].length; charIndex++) {
+            if (lines[i][charIndex] !== lines[j][charIndex]) {
+                differentLetters.push(lines[i][charIndex]);
+            }
+        }
+
+        // We assume that the closest IDs will have a 1 letter difference
+        if (differentLetters.length === 1) {
+            return lines[i].replace(differentLetters[0], '');
+        }
+    }
+
+    throw new Error('Closest 2 IDs were not identified');
+}

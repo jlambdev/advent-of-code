@@ -1,10 +1,18 @@
-export const smallInput = `abcdef
+export const partOneSample = `abcdef
 bababc
 abbcde
 abcccd
 aabcdd
 abcdee
 ababab`;
+
+export const partTwoSample = `abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz`;
 
 export const puzzleInput = `auxwcbzrmdvpsjfgkrthnkioqm
 auxwcbzrmdvpsjfgbltonyijqe

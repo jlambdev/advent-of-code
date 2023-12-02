@@ -1,5 +1,5 @@
-import { puzzleInput } from '../fixture';
-import { sumFrequencies, firstDuplicateFrequency } from '../calibration';
+import { puzzleInput } from './input';
+import { sumFrequencies, firstDuplicateFrequency } from './calibration';
 
 describe('Chronal Calibration', () => {
     it('should sum the frequencies', () => {

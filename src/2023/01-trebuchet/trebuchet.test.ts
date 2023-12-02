@@ -1,4 +1,4 @@
-import { sumCalibrationValuesPartOne } from './trebuchet';
+import { sumCalibrationValuesPartOne, sumCalibrationValuesPartTwo } from './trebuchet';
 import { document } from './input';
 
 const partOneSample = `1abc2
@@ -20,8 +20,8 @@ describe('Trebuchet?!', () => {
         expect(sumCalibrationValuesPartOne(document)).toStrictEqual(55712);
     });
 
-    it.skip('should sum calibration values (numbers and letters)', () => {
-        expect(sumCalibrationValuesPartOne(partTwoSample)).toStrictEqual(281);
-        // expect(sumCalibrationValues(document)).toStrictEqual(0);
+    it('should sum calibration values (numbers and letters)', () => {
+        expect(sumCalibrationValuesPartTwo(partTwoSample)).toStrictEqual(281);
+        expect(sumCalibrationValuesPartTwo(document)).toStrictEqual(55413);
     });
 });

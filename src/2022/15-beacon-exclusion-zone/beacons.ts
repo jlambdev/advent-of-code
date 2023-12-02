@@ -1,5 +1,3 @@
-import { inspectNestedObject } from '../debugUtils';
-
 type Coordinates = { x: number; y: number };
 
 /**

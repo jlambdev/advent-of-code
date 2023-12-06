@@ -2,17 +2,25 @@ function getIntersection(left: Array<number>, right: Array<number>): Array<numbe
     return left.filter((x) => right.includes(x));
 }
 
-export function partOne(input: string): number {
-    const cards = input.split('\n').map((line: string) => {
-        const [, sections] = line.split(': ');
+function getCards(input: string): Array<{
+    winningNumbers: Array<number>;
+    guessedNumbers: Array<number>;
+    copies: number;
+}> {
+    return input.split('\n').map((line: string) => {
+        const [idUnparsed, sections] = line.split(': ');
         const [winningNumbers, guessedNumbers] = sections.split(' | ').map((numbers) => {
             return numbers
                 .split(' ')
                 .filter((number) => !!number)
                 .map(Number);
         });
-        return { winningNumbers, guessedNumbers };
+        return { winningNumbers, guessedNumbers, copies: 1 };
     });
+}
+
+export function partOne(input: string): number {
+    const cards = getCards(input);
 
     const points = cards.map(({ winningNumbers, guessedNumbers }) => {
         const numMatches = getIntersection(winningNumbers, guessedNumbers).length;
@@ -24,4 +32,25 @@ export function partOne(input: string): number {
     });
 
     return points.reduce((total, current) => (total += current), 0);
+}
+
+export function partTwo(input: string): number {
+    const cards = getCards(input);
+
+    let totalCopies = 0;
+    for (let i = 0; i < cards.length; i++) {
+        totalCopies += cards[i].copies;
+        const numMatches = getIntersection(
+            cards[i].winningNumbers,
+            cards[i].guessedNumbers,
+        ).length;
+
+        for (let j = 0; j < cards[i].copies; j++) {
+            for (let k = 1; k <= numMatches; k++) {
+                cards[i + k].copies++;
+            }
+        }
+    }
+
+    return totalCopies;
 }

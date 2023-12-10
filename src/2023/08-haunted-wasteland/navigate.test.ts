@@ -10,6 +10,6 @@ describe('Haunted Wasteland', () => {
 
     it.skip('can simultaneously navigate nodes and identify steps until all on ZZZ', () => {
         expect(partTwo(sampleThree)).toStrictEqual(6);
-        expect(partTwo(puzzleInput)).toStrictEqual(0);
+        expect(partTwo(puzzleInput)).toStrictEqual(0); // ???
     });
 });
